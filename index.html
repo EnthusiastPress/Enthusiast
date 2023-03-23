@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>New Fiction - The Enthusiast</title>
+<link rel="stylesheet" href="Stylesheet.css">
+<meta name="viewport" content="width=device-width,
+initial-scale=1.0">
+<meta charset="UTF-8">
+</head>
+<body>
+
+  <div id = "heading">
+    <p>New Fiction and Old Books in New Bindings</p>
+    </div>
+
+    <div id = "navbar">
+      <img src="Insignia.jpg" alt="The Enthusiast Logo" class = "button">
+      <button class="button" onclick="window.location.href='index.html'">New Books</button>
+      <button class="button" onclick="window.location.href='queeringclassics.html'">Queering the Classics</button>
+      <button class="button" onclick="window.location.href='aboutenthusiast.html'">About the Enthusiast</button>
+      <button class="button" onclick="window.location.href='freebook.html'">Free eBook</button>
+      <button class="button" onclick="window.location.href='submissions.html'">Submissions</button>
+    </div>
+    
+<img src="VroomVroom.jpg" alt="Paperback book." class= "photo">
+<p class="caption">Vroom-Vroom; Grume! is an exercise in style. A queer sci-fi adventure in which the world is not quite as it seems and nothing goes as planned, documenting a period of time the whole galaxy would eventually come to regret.</p>
+<img src="Pansy.jpg" alt="Pansy, a short story collection by Geoffrey Bridgman." class= "photo">
+<p class="caption">Pansy, a short story collection by Geoffrey Bridgman, wrapped in painted paper treated with konyakku powder with decorative pearls on the spine in some editions, and googly eyes in others. .</p>
+<img src="LumpyLog.jpg" alt="Lumpy Log by Clara Lip. A book of poetry wrapped in decorative paper." class= "photo">
+<p class="caption">Lumpy Log by Clara Lip is a tete-beche binding in painted paper.</p>
+<img src="Transcription.jpg" alt="Transcriptions by Katherine Finkelstein" class= "photo">
+<p class="caption">A meditation on loss and the search for meaning in beauty and the sea on which we all float, Transcriptions is a meditation on art by photographer Katherine Finkelstein.</p>
+<img src="DamonStang.jpg" alt="Book by Damon Stang." class= "photo">
+<p class="caption">A grimoire and book of poetry by witch Damon Stang, a practictioner of the tarot who has studied and practiced the art of reading and seeing for over 20 years. The piece chronicles his love of trees, stemming from his childhood in rural South Africa and following his life all the way to present day Brooklyn. Taking place on the eve of Imbolc.</p>
+
+<div id="smart-button-container">
+  <div style="text-align: center;">
+    <div style="margin-bottom: 1.25rem;">
+      <p>Select Title Below</p>
+      <select id="item-options"><option value="Vroom-Vroom; Grume! by Geoffrey Bridgman" price="25.00">Vroom-Vroom; Grume! by Geoffrey Bridgman - 25.00 USD</option><option value="Pansy by Geoffrey Bridgman" price="25.00">Pansy by Geoffrey Bridgman - 25.00 USD</option><option value="Lumpy Log by Clara Lip" price="25.00">Lumpy Log by Clara Lip - 25.00 USD</option><option value="Transcriptions by Katherine Finkelstein" price="25.00">Transcriptions by Katherine Finkelstein - 25.00 USD</option><option value="Of Flowers and Shadows by Damon Stang" price="25.00">Of Flowers and Shadows by Damon Stang - 25.00 USD</option></select>
+      <select style="visibility: hidden" id="quantitySelect"></select>
+    </div>
+  <div id="paypal-button-container"></div>
+  </div>
+</div>
+<script src="https://www.paypal.com/sdk/js?client-id=sb&enable-funding=venmo&currency=USD" data-sdk-integration-source="button-factory"></script>
+<script>
+  function initPayPalButton() {
+    var shipping = 5.00;
+    var itemOptions = document.querySelector("#smart-button-container #item-options");
+var quantity = parseInt();
+var quantitySelect = document.querySelector("#smart-button-container #quantitySelect");
+if (!isNaN(quantity)) {
+  quantitySelect.style.visibility = "visible";
+}
+var orderDescription = 'Select Title Below';
+if(orderDescription === '') {
+  orderDescription = 'Item';
+}
+paypal.Buttons({
+  style: {
+    shape: 'pill',
+    color: 'silver',
+    layout: 'vertical',
+    label: 'paypal',
+    
+  },
+  createOrder: function(data, actions) {
+    var selectedItemDescription = itemOptions.options[itemOptions.selectedIndex].value;
+    var selectedItemPrice = parseFloat(itemOptions.options[itemOptions.selectedIndex].getAttribute("price"));
+    var tax = (8.875 === 0 || false) ? 0 : (selectedItemPrice * (parseFloat(8.875)/100));
+    if(quantitySelect.options.length > 0) {
+      quantity = parseInt(quantitySelect.options[quantitySelect.selectedIndex].value);
+    } else {
+      quantity = 1;
+    }
+
+    tax *= quantity;
+    tax = Math.round(tax * 100) / 100;
+    var priceTotal = quantity * selectedItemPrice + parseFloat(shipping) + tax;
+    priceTotal = Math.round(priceTotal * 100) / 100;
+    var itemTotalValue = Math.round((selectedItemPrice * quantity) * 100) / 100;
+
+    return actions.order.create({
+      purchase_units: [{
+        description: orderDescription,
+        amount: {
+          currency_code: 'USD',
+          value: priceTotal,
+          breakdown: {
+            item_total: {
+              currency_code: 'USD',
+              value: itemTotalValue,
+            },
+            shipping: {
+              currency_code: 'USD',
+              value: shipping,
+            },
+            tax_total: {
+              currency_code: 'USD',
+              value: tax,
+            }
+          }
+        },
+        items: [{
+          name: selectedItemDescription,
+          unit_amount: {
+            currency_code: 'USD',
+            value: selectedItemPrice,
+          },
+          quantity: quantity
+        }]
+      }]
+    });
+  },
+  onApprove: function(data, actions) {
+    return actions.order.capture().then(function(orderData) {
+      
+      // Full available details
+      console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+
+      // Show a success message within this page, e.g.
+      const element = document.getElementById('paypal-button-container');
+      element.innerHTML = '';
+      element.innerHTML = '<h3>Thank you for your payment!</h3>';
+
+      // Or go to another URL:  actions.redirect('thank_you.html');
+
+    });
+  },
+  onError: function(err) {
+    console.log(err);
+  },
+}).render('#paypal-button-container');
+}
+initPayPalButton();
+</script>
+
+<p class="caption">&copy; 2023 Geoffrey Bridgman</p>
+
+
+
+<div class='wrap'>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+  <div class='c'></div>
+</div>
+
+</body>
+</html>
